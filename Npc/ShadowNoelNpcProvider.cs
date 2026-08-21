@@ -11,7 +11,7 @@ namespace Polaris.AI;
 
 internal sealed class ShadowNoelNpcProvider : INpcBodyProvider
 {
-    public bool CanSpawn(string definitionId) => definitionId == "shadow.noel";
+    public bool CanSpawn(string definitionId) => definitionId == BuiltInNpcIds.ShadowNoel;
 
     public NpcSpawnResult? Spawn(NpcSpawnRequest request, GameVector2 position)
     {
@@ -37,12 +37,7 @@ internal sealed class ShadowNoelNpcProvider : INpcBodyProvider
 
         GameCharacter character = GameCharacter.Wrap(body);
         return new NpcSpawnResult(character, body.destruct,
-            visible => SetVisible(body, visible), defaultFaction: "player");
-    }
-
-    static void SetVisible(M2Mover mover, bool visible)
-    {
-        foreach (Renderer renderer in mover.gameObject.GetComponentsInChildren<Renderer>(true)) renderer.enabled = visible;
+            visible => NpcBodyVisibility.Set(body, visible), defaultFaction: "player");
     }
 }
 
@@ -65,7 +60,7 @@ internal static class ShadowNoelCompatibility
         }
         catch (Exception ex)
         {
-            Polaris.PolarisAPI.Errors.Report(ex, "Validating ShadowNoel game version");
+            PolarisAPI.Errors.Report(ex, "Validating ShadowNoel game version");
             return (supported = false).Value;
         }
     }

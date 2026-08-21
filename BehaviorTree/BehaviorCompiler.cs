@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using Polaris.AI.Authoring;
+using Polaris.API;
 
 namespace Polaris.AI;
 
@@ -106,18 +107,16 @@ internal static class BehaviorCompiler
 
     static NodeStatus TargetInRange(BehaviorContext context, double range)
     {
-        var target = context.Actor.Target;
+        GameCharacter? target = context.Actor.Target;
         if (target == null) return NodeStatus.Failure;
-        double dx = target.X - context.Actor.X;
-        double dy = target.Y - context.Actor.Y;
-        return dx * dx + dy * dy <= range * range ? NodeStatus.Success : NodeStatus.Failure;
+        return BehaviorGeometry.WithinRange(context.Actor, target, range) ? NodeStatus.Success : NodeStatus.Failure;
     }
 
     static NodeStatus FaceTarget(BehaviorContext context)
     {
-        var target = context.Actor.Target;
+        GameCharacter? target = context.Actor.Target;
         if (target == null) return NodeStatus.Failure;
-        context.Actor.SetFacing(target.X >= context.Actor.X ? Polaris.API.GameFacing.Right : Polaris.API.GameFacing.Left);
+        context.Actor.SetFacing(target.X >= context.Actor.X ? GameFacing.Right : GameFacing.Left);
         return NodeStatus.Success;
     }
 }
@@ -137,12 +136,10 @@ internal sealed class BehaviorRuntime
     }
     internal string BehaviorId { get; }
     internal Dictionary<string, object?> Attributes { get; }
-    internal NodeStatus LastStatus { get; private set; }
     internal NodeStatus Tick(float deltaTime)
     {
-        context.DeltaTime = deltaTime;
         context.Time += Math.Max(0, deltaTime);
-        return LastStatus = root.Tick(context);
+        return root.Tick(context);
     }
     internal void Abort(AbortReason reason) => root.Abort(context, reason);
     internal bool TrySetAttribute<T>(string key, T value)

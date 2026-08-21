@@ -1,9 +1,8 @@
-using m2d;
 using System;
+using m2d;
 using Polaris.AI.Registration;
 using Polaris.API;
 using Polaris.Res.Pxls;
-using UnityEngine;
 
 namespace Polaris.AI;
 
@@ -68,7 +67,7 @@ internal sealed class PolarisPnpcBody : M2AttackableP
     internal void SetVisible(bool visible)
     {
         if (animator != null) animator.alpha = visible ? 1f : 0f;
-        foreach (Renderer renderer in gameObject.GetComponentsInChildren<Renderer>(true)) renderer.enabled = visible;
+        NpcBodyVisibility.Set(this, visible);
     }
 
     public override bool isDamagingOrKo() => !is_alive;

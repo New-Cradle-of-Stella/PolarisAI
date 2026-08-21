@@ -8,22 +8,20 @@ public static class AIAPI
     public static class Npcs
     {
         public static AINpc? Spawn(string definitionId, GameMap map, GameVector2 position, string? instanceKey = null)
-        {
-            NpcSpawnRequest request = NpcSpawnRequest.At(definitionId, map, position);
-            if (instanceKey != null) request.WithKey(instanceKey);
-            return Spawn(request);
-        }
+            => SpawnWithOptionalKey(NpcSpawnRequest.At(definitionId, map, position), instanceKey);
 
         public static AINpc? SpawnAtAnchor(string definitionId, GameMap map, string anchorKey, string? instanceKey = null)
-        {
-            NpcSpawnRequest request = NpcSpawnRequest.AtAnchor(definitionId, map, anchorKey);
-            if (instanceKey != null) request.WithKey(instanceKey);
-            return Spawn(request);
-        }
+            => SpawnWithOptionalKey(NpcSpawnRequest.AtAnchor(definitionId, map, anchorKey), instanceKey);
 
         public static AINpc? Spawn(NpcSpawnRequest request) => NpcSpawner.Spawn(request);
         public static AINpc? Find(string instanceKey, GameMap? map = null) => AIActorRegistry.FindNpc(instanceKey, map);
         public static IReadOnlyList<AINpc> GetAll(GameMap? map = null) => AIActorRegistry.GetNpcs(map);
+
+        static AINpc? SpawnWithOptionalKey(NpcSpawnRequest request, string? instanceKey)
+        {
+            if (instanceKey != null) request.WithKey(instanceKey);
+            return NpcSpawner.Spawn(request);
+        }
     }
 
     public static class Actors

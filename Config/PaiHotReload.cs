@@ -1,40 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
+using Polaris.Content;
 
 namespace Polaris.AI;
 
+/// <summary>薄封装：把 .pai 目录的轮询热重载接到共享的 <see cref="ContentHotReloadWatcher"/>。</summary>
 internal sealed class PaiHotReload
 {
-    readonly string directory;
-    readonly Dictionary<string, DateTime> stamps = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
-    double elapsed;
+    readonly ContentHotReloadWatcher watcher;
 
-    internal PaiHotReload(string directory) { this.directory = directory; }
-
-    internal void Initialize()
+    internal PaiHotReload(string directory)
     {
-        Directory.CreateDirectory(directory);
-        Scan(true);
+        // 重载失败保留上一份编译结果（BehaviorRepository.LoadFile 本身就是这个语义），这里不用管成功与否。
+        watcher = new ContentHotReloadWatcher(directory, "*.pai", path => BehaviorRepository.LoadFile(path));
     }
 
-    internal void Tick(float deltaTime)
-    {
-        elapsed += Math.Max(0, deltaTime);
-        if (elapsed < 0.5) return;
-        elapsed = 0;
-        Scan(false);
-    }
+    internal void Initialize() => watcher.Initialize();
 
-    void Scan(bool initial)
-    {
-        foreach (string path in Directory.EnumerateFiles(directory, "*.pai", SearchOption.AllDirectories))
-        {
-            DateTime stamp = File.GetLastWriteTimeUtc(path);
-            if (stamps.TryGetValue(path, out DateTime old) && old == stamp) continue;
-            stamps[path] = stamp;
-            if (initial) BehaviorRepository.LoadFile(path);
-            else BehaviorRepository.LoadFile(path); // failed reload keeps the previous compiled behavior
-        }
-    }
+    internal void Tick(float deltaTime) => watcher.Tick(deltaTime);
 }

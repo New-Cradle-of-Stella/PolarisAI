@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Polaris.API;
 
 namespace Polaris.AI;
@@ -42,14 +43,14 @@ internal static class NpcSpawner
     internal static AINpc? Spawn(NpcSpawnRequest request)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        if (!request.Map.IsValid || !ReferenceEquals(request.Map, Polaris.PolarisAPI.Game.World.CurrentMap))
+        if (!request.Map.IsValid || !ReferenceEquals(request.Map, PolarisAPI.Game.World.CurrentMap))
             return Fail("The target map is not the current writable map.");
         if (request.Placement == NpcPlacementMode.SnapToGround)
             return Fail("SnapToGround is not enabled until the collision query has passed runtime validation.");
         if (request.AnchorKey != null && !request.Map.HasAnchor(request.AnchorKey))
             return Fail($"Map anchor '{request.AnchorKey}' does not exist.");
 
-        string key = request.InstanceKey ?? $"{request.DefinitionId}#{System.Threading.Interlocked.Increment(ref nextKey)}";
+        string key = request.InstanceKey ?? $"{request.DefinitionId}#{Interlocked.Increment(ref nextKey)}";
         if (AIActorRegistry.FindNpc(key, request.Map) != null) return Fail($"NPC instance key '{key}' is already in use.");
         if (request.InstanceKey == null) request.WithKey(key);
         INpcBodyProvider? provider = Providers.Find(x => x.CanSpawn(request.DefinitionId));
@@ -74,14 +75,14 @@ internal static class NpcSpawner
         }
         catch (Exception ex)
         {
-            Polaris.PolarisAPI.Errors.Report(ex, $"PolarisAI spawn '{request.DefinitionId}'");
+            PolarisAPI.Errors.Report(ex, $"PolarisAI spawn '{request.DefinitionId}'");
             return null;
         }
     }
 
     static AINpc? Fail(string message)
     {
-        Polaris.PolarisAPI.Errors.Report(new InvalidOperationException(message), "PolarisAI.Npcs.Spawn");
+        PolarisAPI.Errors.Report(new InvalidOperationException(message), "PolarisAI.Npcs.Spawn");
         return null;
     }
 }

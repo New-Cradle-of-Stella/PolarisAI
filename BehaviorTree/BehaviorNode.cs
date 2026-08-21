@@ -35,8 +35,18 @@ internal sealed class BehaviorContext
     internal AIActor Actor { get; }
     internal Dictionary<string, object?> Attributes { get; }
     internal Random Random { get; }
-    internal float DeltaTime { get; set; }
     internal double Time { get; set; }
+}
+
+/// <summary>行为节点共用的距离判定。用平方比较，免去开方；<paramref name="range"/> 由调用方按各自语义夹取。</summary>
+internal static class BehaviorGeometry
+{
+    internal static bool WithinRange(AIActor actor, GameCharacter target, double range)
+    {
+        double dx = target.X - actor.X;
+        double dy = target.Y - actor.Y;
+        return dx * dx + dy * dy <= range * range;
+    }
 }
 
 internal abstract class BehaviorNode
@@ -298,9 +308,7 @@ internal sealed class AttackTargetNode : BehaviorNode
     {
         GameCharacter? target = context.Actor.Target;
         if (target == null || !target.IsAlive) return NodeStatus.Failure;
-        double dx = target.X - context.Actor.X;
-        double dy = target.Y - context.Actor.Y;
-        if (dx * dx + dy * dy > Math.Pow(Math.Max(0, range(context)), 2)) return NodeStatus.Failure;
+        if (!BehaviorGeometry.WithinRange(context.Actor, target, Math.Max(0, range(context)))) return NodeStatus.Failure;
         if (context.Time < readyAt) return NodeStatus.Running;
         int amount = Math.Max(0, damage(context));
         if (amount == 0) return NodeStatus.Failure;

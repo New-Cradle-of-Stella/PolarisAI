@@ -52,7 +52,7 @@ public sealed class AINpc : AIActor
         }
         catch (Exception ex)
         {
-            Polaris.PolarisAPI.Errors.Report(ex, $"PolarisAI despawn '{InstanceKey}'");
+            PolarisAPI.Errors.Report(ex, $"PolarisAI despawn '{InstanceKey}'");
             return false;
         }
     }

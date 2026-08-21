@@ -13,7 +13,7 @@ internal static class AIActorRegistry
     {
         if (character?.IsValid != true) return null;
         if (Actors.TryGetValue(character, out AIActor existing) && existing.IsValid) return existing;
-        var actor = new AIActor(character, Polaris.PolarisAPI.Game.World.CurrentMap);
+        var actor = new AIActor(character, PolarisAPI.Game.World.CurrentMap);
         Actors[character] = actor;
         return actor;
     }
@@ -27,25 +27,22 @@ internal static class AIActorRegistry
     {
         if (string.IsNullOrWhiteSpace(instanceKey)) return null;
         if (!Npcs.TryGetValue(instanceKey, out AINpc npc) || !npc.IsValid) return null;
-        GameMap? targetMap = map ?? Polaris.PolarisAPI.Game.World.CurrentMap;
+        GameMap? targetMap = map ?? PolarisAPI.Game.World.CurrentMap;
         return targetMap != null && ReferenceEquals(npc.Map, targetMap) ? npc : null;
     }
 
-    internal static IReadOnlyList<AIActor> GetActors(GameMap? map)
-    {
-        var result = new List<AIActor>();
-        GameMap? targetMap = map ?? Polaris.PolarisAPI.Game.World.CurrentMap;
-        foreach (AIActor actor in Actors.Values)
-            if (actor.IsValid && targetMap != null && ReferenceEquals(actor.Map, targetMap)) result.Add(actor);
-        return result;
-    }
+    internal static IReadOnlyList<AIActor> GetActors(GameMap? map) => OnMap(Actors.Values, map);
 
-    internal static IReadOnlyList<AINpc> GetNpcs(GameMap? map)
+    internal static IReadOnlyList<AINpc> GetNpcs(GameMap? map) => OnMap(Npcs.Values, map);
+
+    /// <summary>筛出仍然有效、且挂在目标地图上的条目；<paramref name="map"/> 省略时用当前地图，没有当前地图则视为空。</summary>
+    static IReadOnlyList<T> OnMap<T>(IEnumerable<T> candidates, GameMap? map) where T : AIActor
     {
-        var result = new List<AINpc>();
-        GameMap? targetMap = map ?? Polaris.PolarisAPI.Game.World.CurrentMap;
-        foreach (AINpc npc in Npcs.Values)
-            if (npc.IsValid && targetMap != null && ReferenceEquals(npc.Map, targetMap)) result.Add(npc);
+        var result = new List<T>();
+        GameMap? targetMap = map ?? PolarisAPI.Game.World.CurrentMap;
+        if (targetMap == null) return result;
+        foreach (T candidate in candidates)
+            if (candidate.IsValid && ReferenceEquals(candidate.Map, targetMap)) result.Add(candidate);
         return result;
     }
 

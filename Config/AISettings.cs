@@ -24,7 +24,7 @@ internal static class AISettings
         catch (Exception ex)
         {
             enabled = null;
-            Polaris.PolarisAPI.Errors.Report(ex, "Loading PolarisAI settings");
+            PolarisAPI.Errors.Report(ex, "Loading PolarisAI settings");
         }
     }
 }

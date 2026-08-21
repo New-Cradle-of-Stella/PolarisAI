@@ -92,7 +92,7 @@ public class AIActor
         if (target?.IsValid != true) return false;
         AIActor? attachedTarget = AIActorRegistry.Find(target);
         if (attachedTarget != null && !ReferenceEquals(Map, attachedTarget.Map)) return false;
-        if (attachedTarget == null && !ReferenceEquals(Map, Polaris.PolarisAPI.Game.World.CurrentMap)) return false;
+        if (attachedTarget == null && !ReferenceEquals(Map, PolarisAPI.Game.World.CurrentMap)) return false;
         this.target = target;
         return true;
     }
@@ -144,7 +144,7 @@ public class AIActor
         {
             behavior.Abort(AbortReason.NativeStateChanged);
             behaviorEnabled = false;
-            Polaris.PolarisAPI.Errors.Report(ex, $"PolarisAI behavior '{behavior.BehaviorId}'");
+            PolarisAPI.Errors.Report(ex, $"PolarisAI behavior '{behavior.BehaviorId}'");
         }
     }
 

@@ -6,7 +6,7 @@ namespace Polaris.AI;
 
 internal sealed class CustomNpcProvider : INpcBodyProvider
 {
-    public bool CanSpawn(string definitionId) => definitionId == "custom.basic";
+    public bool CanSpawn(string definitionId) => definitionId == BuiltInNpcIds.CustomBasic;
 
     public NpcSpawnResult? Spawn(NpcSpawnRequest request, GameVector2 position)
     {
@@ -17,12 +17,8 @@ internal sealed class CustomNpcProvider : INpcBodyProvider
         body.appear(map);
         map.assignMover(body);
         GameCharacter character = GameCharacter.Wrap(body);
-        return new NpcSpawnResult(character, body.destruct, visible => SetVisible(body, visible), defaultFaction: "neutral");
-    }
-
-    static void SetVisible(M2Mover mover, bool visible)
-    {
-        foreach (Renderer renderer in mover.gameObject.GetComponentsInChildren<Renderer>(true)) renderer.enabled = visible;
+        return new NpcSpawnResult(character, body.destruct,
+            visible => NpcBodyVisibility.Set(body, visible), defaultFaction: "neutral");
     }
 }
 
