@@ -1,0 +1,43 @@
+{
+  "format": "polaris.ai.behavior",
+  "version": 1,
+  "id": "polaris.helper_combat",
+  "mainTree": "main",
+  "imports": [],
+  "behaviorAttributes": {
+    "speed": { "type": "number", "default": 0.08, "description": "Horizontal movement speed." },
+    "attackRange": { "type": "number", "default": 1.2, "description": "Maximum attack distance." },
+    "damage": { "type": "integer", "default": 10, "description": "Damage per hit." },
+    "attackCooldown": { "type": "number", "default": 0.6, "description": "Seconds between hits." }
+  },
+  "trees": [
+    {
+      "id": "main",
+      "root": "root",
+      "nodes": [
+        { "id": "root", "type": "ReactiveSequence", "name": "Help fight", "ports": {}, "children": ["has_target", "face", "combat"] },
+        { "id": "has_target", "type": "HasTarget", "name": "Has target", "ports": {}, "children": [] },
+        { "id": "face", "type": "FaceTarget", "name": "Face target", "ports": {}, "children": [] },
+        { "id": "combat", "type": "Fallback", "name": "Attack or approach", "ports": {}, "children": ["attack_sequence", "approach"] },
+        { "id": "attack_sequence", "type": "Sequence", "name": "Attack", "ports": {}, "children": ["in_range", "hit"] },
+        { "id": "in_range", "type": "TargetInRange", "name": "In range", "ports": { "range": "{behavior.attackRange}" }, "children": [] },
+        { "id": "hit", "type": "AttackTarget", "name": "Hit target", "ports": { "range": "{behavior.attackRange}", "damage": "{behavior.damage}", "cooldown": "{behavior.attackCooldown}" }, "children": [] },
+        { "id": "approach", "type": "MoveToTarget", "name": "Approach", "ports": { "speed": "{behavior.speed}", "stopDistance": "{behavior.attackRange}" }, "children": [] }
+      ]
+    }
+  ],
+  "editor": {
+    "viewport": { "x": 0, "y": 0, "zoom": 1 },
+    "nodes": {
+      "root": { "x": 60, "y": 180, "collapsed": false },
+      "has_target": { "x": 320, "y": 40, "collapsed": false },
+      "face": { "x": 320, "y": 130, "collapsed": false },
+      "combat": { "x": 320, "y": 240, "collapsed": false },
+      "attack_sequence": { "x": 580, "y": 180, "collapsed": false },
+      "in_range": { "x": 840, "y": 130, "collapsed": false },
+      "hit": { "x": 840, "y": 230, "collapsed": false },
+      "approach": { "x": 580, "y": 340, "collapsed": false }
+    }
+  },
+  "extensions": {}
+}
