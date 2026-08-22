@@ -8,12 +8,8 @@
   </PropertyGroup>
   <Import Project="..\PolarisCore\build\Polaris.Runtime.props" />
   <ItemGroup>
-    <Compile Remove="xlsx_work\**\*.cs" />
     <Compile Remove="PolarisAI.Authoring\**\*.cs" />
-    <Compile Remove="PolarisAI.Authoring.Tests\**\*.cs" />
-    <None Remove="xlsx_work\**\*" />
     <None Remove="PolarisAI.Authoring\**\*" />
-    <None Remove="PolarisAI.Authoring.Tests\**\*" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PolarisCore\PolarisCore.csproj" />

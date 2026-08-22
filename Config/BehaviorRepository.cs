@@ -38,8 +38,8 @@ internal static class BehaviorRepository
         {
             PaiDocument document = LoadWithImports(Path.GetFullPath(path), new HashSet<string>(StringComparer.OrdinalIgnoreCase));
             CompiledBehavior compiled = BehaviorCompiler.Compile(document);
-            // 必须先查冲突再退旧 id：否则"某文件改成占用别人的 id"会先把它原来的 id 从目录里摘掉，
-            // 然后注册失败，白白丢一份本来还好用的行为。
+            // 必须先检测 id 冲突，再移除旧 id 的注册。顺序颠倒时，抢占了别人 id 的文件会先丢掉自己原来的注册，
+            // 随后新注册又失败，白白丢失一份本来可用的行为。
             if (IsOwnedByAnotherFile(compiled.Id, path))
                 throw new InvalidOperationException($"Behavior id '{compiled.Id}' is already defined by another file in this layer.");
             if (SourceIds.TryGetValue(path, out string oldId) && oldId != compiled.Id) Behaviors.Remove(oldId);
