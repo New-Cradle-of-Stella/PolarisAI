@@ -122,7 +122,9 @@ internal sealed class PolarisShadowNoel : PRMain
 [HarmonyPatch(typeof(Map2d), nameof(Map2d.assignCenterPlayer), new[] { typeof(M2MoverPr) })]
 internal static class Patch_BackgroundNoel_AssignCenterPlayer
 {
-    static bool Prefix(M2MoverPr Pr) => !(Pr is PolarisShadowNoel);
+    // Harmony's __0 positional name is stable even when the game's metadata renames
+    // assignCenterPlayer's first parameter (ver029 calls it "Mov", older builds used "Pr").
+    static bool Prefix(M2MoverPr __0) => !(__0 is PolarisShadowNoel);
 }
 
 [HarmonyPatch(typeof(M2MoverPr), nameof(M2MoverPr.isEvadeO), new[] { typeof(int) })]

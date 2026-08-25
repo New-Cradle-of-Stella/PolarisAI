@@ -5,6 +5,9 @@
     <RootNamespace>Polaris.AI</RootNamespace>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <!-- Runtime deployment copies this project's output directory. Keep the full
+         PolarisAI.Authoring dependency closure (System.Text.Json included) beside it. -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <Import Project="..\PolarisCore\build\Polaris.Runtime.props" />
   <ItemGroup>
